@@ -45,3 +45,5 @@ The app can use local video files, Hap/MOV via KlakHap, YouTube URL resolving,
 and Pro DJ Link / Beat Link Trigger metadata modes depending on the local
 environment. External tools such as `yt-dlp`, `ffmpeg`/`ffprobe`, and Beat Link
 Trigger are not bundled.
+
+Pro DJ Link integration has only been tested with CDJ-3000 players.
