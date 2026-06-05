@@ -2,6 +2,8 @@
 
 Unity-based VJ/video overlay prototype for Pro DJ Link environments.
 
+Japanese setup and operation guide: [README_JA.md](README_JA.md)
+
 This public repository contains only the source code and Unity project files
 needed to open and build the project. Proprietary, paid, and third-party asset
 packs are intentionally not included.
