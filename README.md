@@ -4,25 +4,12 @@ Unity-based VJ/video overlay prototype for Pro DJ Link environments.
 
 Japanese setup and operation guide: [README_JA.md](README_JA.md)
 
-This public repository contains only the source code and Unity project files
-needed to open and build the project. Proprietary, paid, and third-party asset
-packs are intentionally not included.
+This repository contains the Unity project files needed to open and build the
+app.
 
-## Included
+## Optional Assets
 
-- Unity runtime/editor scripts
-- Layer compositing shaders
-- Main Unity scene
-- Unity package manifest and project settings
-
-## Excluded assets
-
-The working project used additional local assets such as video plugins, skybox
-materials, city models, and recovery/build/cache folders. They are excluded from
-this public repository.
-
-The 3D object / lighting scene can still run with fallback generated geometry,
-but optional city models and skybox materials must be supplied separately under:
+To use custom 3D models or skybox materials, place them under:
 
 - `Assets/Resources/Models`
 - `Assets/Resources/Skyboxes`

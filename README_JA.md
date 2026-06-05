@@ -2,7 +2,7 @@
 
 Unityで動作するVJ向け映像レイヤー/Pro DJ Link連携アプリです。メイン8レイヤーの映像合成、ローカル動画再生、Hap/MOV再生、YouTube URL解決、3Dオブジェクト表示、Beat Link Trigger連携、MIDI割り当てを扱います。
 
-この公開版には、ソースコードとUnityプロジェクト設定のみを含めています。有料アセット、動画素材、都市モデル、Skybox素材、ビルド成果物、Unityキャッシュは含めていません。
+このリポジトリには、Unityで開いてビルドするためのプロジェクトファイルを含めています。
 
 ## 動作環境
 
@@ -36,19 +36,9 @@ git clone https://github.com/Welltom-tsukua/VJ_welltom.git
 
 5. Playまたはビルドで起動します。
 
-## 公開版で除外しているもの
+## 追加素材の配置
 
-以下は公開版に含めていません。
-
-- AVProVideo本体
-- 動画素材
-- Hap/MOV素材
-- Skybox画像/マテリアル素材
-- Japanese Otaku Cityなどの都市モデル
-- Unityの `Library`, `Temp`, `Logs`, `Build`, `UserSettings`
-- ローカルキャッシュ
-
-3Dモードで任意のモデルやSkyboxを使う場合は、次の場所に自分で配置します。
+3Dモードで任意のモデルやSkyboxを使う場合は、次の場所に配置します。
 
 ```text
 Assets/Resources/Models
@@ -150,7 +140,7 @@ Unity Editorで確認する場合は、GameビューのDisplay選択でDisplay 2
 - トンネルモード
 - ライティングモード
 
-公開版では都市モデルなどの素材は含めていません。モデルがない場合はフォールバック形状で動作します。
+3D Objectは、`Assets/Resources/Models` に配置したモデルや `Assets/Resources/Skyboxes` に配置したSkyboxを読み込めます。
 
 ## ビルド
 
@@ -160,4 +150,4 @@ Unity Editorから通常のBuild Settingsでビルドします。プロジェク
 
 ## 注意
 
-この公開版は、ローカル開発版から公開可能なファイルだけを切り出したものです。完全な素材付き実行環境ではありません。映像素材、都市モデル、Skybox、外部ツールは利用者側で用意してください。
+外部ツールを使う機能では、`yt-dlp`、`ffmpeg` / `ffprobe`、Beat Link Triggerなどを利用環境に合わせて用意してください。
