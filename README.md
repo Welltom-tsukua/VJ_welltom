@@ -1,41 +1,36 @@
 # BeatLinkUnityOverlay
 
-This Unity project listens to Pro DJ Link packets directly in Unity and renders
-the current player state without starting Beat Link Trigger.
+Unity-based VJ/video overlay prototype for Pro DJ Link environments.
 
-The same UI also opens a Windows capture device with Unity's WebCamTexture API
-and shows an HDMI capture preview above the DJ Link status panel.
+Japanese setup and operation guide: [README_JA.md](README_JA.md)
 
-Beat Link Trigger can also be started as a metadata and waveform companion
-server. Unity polls `http://127.0.0.1:17081/params.json` for track metadata and
-loads runtime waveforms from `/wave-preview/1` and `/wave-preview/2`, while
-keeping CDJ status parsing inside Unity.
+This repository contains the Unity project files needed to open and build the
+app.
 
-Current direct packet support:
+## Optional Assets
 
-- UDP 50000 device announcements
-- UDP 50001 precise playback position
-- UDP 50002 CDJ status
-- TCP 12523 dbserver port discovery
+To use custom 3D models or skybox materials, place them under:
 
-The first Unity-only pass displays device name/address, master, play/sync/on-air
-flags, BPM, effective BPM, pitch, rekordbox ID, track number, beat, and playback
-time when precise position packets are present. It also detects each player's
-dbserver port so the next port can request metadata and waveforms.
+- `Assets/Resources/Models`
+- `Assets/Resources/Skyboxes`
 
-Track title, artist, and real waveform images are not in the normal status
-packets. They still need the Beat Link Trigger metadata and waveform query
-protocols to be ported.
+## Dependencies
 
-Build the player with Unity, then start it:
+Unity resolves package dependencies from `Packages/manifest.json`, including:
 
-```powershell
-..\start-beatlink-unity.ps1
-```
+- KlakHap
+- Unity LightBeamPerformance
+- Unity Collections
+- Unity Timeline
 
-Open this folder with Unity 6000.3.10f1 or newer. The runtime script creates
-its own GameObject automatically, so no scene setup is required.
+Open the project with the Unity version in `ProjectSettings/ProjectVersion.txt`
+or newer.
 
-If Unity picks the wrong camera/capture device, set the `HDMI_CAPTURE_DEVICE`
-environment variable to part of the device name, or use the in-app
-`Next Capture Device` button.
+## Runtime Notes
+
+The app can use local video files, Hap/MOV via KlakHap, YouTube URL resolving,
+and Pro DJ Link / Beat Link Trigger metadata modes depending on the local
+environment. External tools such as `yt-dlp`, `ffmpeg`/`ffprobe`, and Beat Link
+Trigger are not bundled.
+
+Pro DJ Link integration has only been tested with CDJ-3000 players.
