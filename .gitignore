@@ -5,6 +5,8 @@ Obj/
 Build/
 Builds/
 UserSettings/
+Assets/_Recovery/
+*.codex-backup
 *.csproj
 *.sln
 *.user

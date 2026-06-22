@@ -1,38 +1,136 @@
 using System.IO;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
+[InitializeOnLoad]
 public static class BuildBeatLinkOverlay
 {
+    private const string MainScenePath = "Assets/Scenes/Main.unity";
+    private const string DefaultBuildName = "BeatLinkUnityOverlay.exe";
+
+    static BuildBeatLinkOverlay()
+    {
+        BuildPlayerWindow.RegisterBuildPlayerHandler(BuildFromUnityWindow);
+    }
+
+    [MenuItem("BeatLink/Build Windows Player")]
     public static void BuildWindowsPlayer()
     {
-        var sceneDir = "Assets/Scenes";
-        Directory.CreateDirectory(sceneDir);
-
-        var scenePath = Path.Combine(sceneDir, "Main.unity").Replace('\\', '/');
-        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        RenderSettings.ambientLight = Color.black;
-        EditorSceneManager.SaveScene(scene, scenePath);
-
-        var buildDir = Path.GetFullPath("Build");
-        Directory.CreateDirectory(buildDir);
-
         var options = new BuildPlayerOptions
         {
-            scenes = new[] { scenePath },
-            locationPathName = Path.Combine(buildDir, "BeatLinkUnityOverlay.exe"),
+            locationPathName = Path.Combine(Path.GetFullPath("Build"), DefaultBuildName),
             target = BuildTarget.StandaloneWindows64,
             options = BuildOptions.None
         };
 
-        var report = BuildPipeline.BuildPlayer(options);
-        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+        BuildWithMainScene(options);
+    }
+
+    [MenuItem("BeatLink/Open Main Scene")]
+    public static void OpenMainScene()
+    {
+        if (!File.Exists(MainScenePath))
+        {
+            throw new FileNotFoundException("Main scene not found.", MainScenePath);
+        }
+
+        EditorSceneManager.OpenScene(MainScenePath);
+    }
+
+    [MenuItem("BeatLink/Sync Build Settings")]
+    public static void EnsureBuildSettingsScene()
+    {
+        var existing = EditorBuildSettings.scenes;
+        if (existing != null)
+        {
+            for (var i = 0; i < existing.Length; i++)
+            {
+                if (existing[i] != null && string.Equals(existing[i].path, MainScenePath, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!existing[i].enabled)
+                    {
+                        existing[i].enabled = true;
+                        EditorBuildSettings.scenes = existing;
+                    }
+                    return;
+                }
+            }
+        }
+
+        EditorBuildSettings.scenes = new[]
+        {
+            new EditorBuildSettingsScene(MainScenePath, true)
+        };
+    }
+
+    private static void BuildFromUnityWindow(BuildPlayerOptions options)
+    {
+        BuildWithMainScene(options);
+    }
+
+    private static void BuildWithMainScene(BuildPlayerOptions options)
+    {
+        EnsureMainSceneExists();
+        EnsureBuildSettingsScene();
+        EnsureMainSceneLoadedIfEditorHasBackupScene();
+
+        var sanitizedOptions = SanitizeOptions(options);
+        EditorSceneManager.SaveOpenScenes();
+
+        var report = BuildPipeline.BuildPlayer(sanitizedOptions);
+        if (report.summary.result != BuildResult.Succeeded)
         {
             throw new System.Exception("Build failed: " + report.summary.result);
         }
 
-        Debug.Log("Built " + options.locationPathName);
+        Debug.Log("Built " + sanitizedOptions.locationPathName);
+    }
+
+    private static void EnsureMainSceneExists()
+    {
+        if (!File.Exists(MainScenePath))
+        {
+            throw new FileNotFoundException("Main scene not found.", MainScenePath);
+        }
+    }
+
+    private static void EnsureMainSceneLoadedIfEditorHasBackupScene()
+    {
+        var activeScene = EditorSceneManager.GetActiveScene();
+        if (string.IsNullOrEmpty(activeScene.path))
+        {
+            OpenMainScene();
+            return;
+        }
+
+        if (activeScene.path.Replace('\\', '/').Contains("/Temp/__Backupscenes/"))
+        {
+            Debug.LogWarning("Active scene was a Unity backup scene. Opening Assets/Scenes/Main.unity for build.");
+            OpenMainScene();
+        }
+    }
+
+    private static BuildPlayerOptions SanitizeOptions(BuildPlayerOptions options)
+    {
+        var sanitized = options;
+        sanitized.scenes = new[] { MainScenePath };
+        sanitized.target = BuildTarget.StandaloneWindows64;
+
+        if (string.IsNullOrWhiteSpace(sanitized.locationPathName))
+        {
+            sanitized.locationPathName = Path.Combine(Path.GetFullPath("Build"), DefaultBuildName);
+        }
+
+        var outputDir = Path.GetDirectoryName(sanitized.locationPathName);
+        if (string.IsNullOrWhiteSpace(outputDir))
+        {
+            outputDir = Path.GetFullPath("Build");
+            sanitized.locationPathName = Path.Combine(outputDir, DefaultBuildName);
+        }
+
+        Directory.CreateDirectory(outputDir);
+        return sanitized;
     }
 }

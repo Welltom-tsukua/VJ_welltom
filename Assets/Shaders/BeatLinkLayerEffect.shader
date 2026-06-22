@@ -125,9 +125,50 @@ Shader "BeatLink/LayerEffect"
                     pulse *= saturate(_Intensity);
                     return fixed4(1.0, 1.0, 1.0, pulse);
                 }
+                if (_Mode < 10.5)
+                {
+                    float2 tiled = frac(uv * 2.0);
+                    return SampleMain(tiled);
+                }
+                if (_Mode < 11.5)
+                {
+                    float2 mirroredUv = uv;
+                    if (_Axis > 1.5)
+                    {
+                        mirroredUv.x = uv.x < 0.5 ? uv.x * 2.0 : (1.0 - uv.x) * 2.0;
+                        mirroredUv.y = uv.y < 0.5 ? uv.y * 2.0 : (1.0 - uv.y) * 2.0;
+                    }
+                    else if (_Axis > 0.5)
+                    {
+                        mirroredUv.y = uv.y < 0.5 ? uv.y * 2.0 : (1.0 - uv.y) * 2.0;
+                    }
+                    else
+                    {
+                        mirroredUv.x = uv.x < 0.5 ? uv.x * 2.0 : (1.0 - uv.x) * 2.0;
+                    }
+                    return SampleMain(mirroredUv);
+                }
+                if (_Mode < 12.5)
+                {
+                    float2 centered = uv - float2(0.5, 0.5);
+                    float radius = length(centered);
+                    float angle = atan2(centered.y, centered.x) + _BeatCount * 0.08 * saturate(_Intensity);
+                    float segments = lerp(3.0, 12.0, saturate(_Intensity));
+                    float slice = UNITY_PI * 2.0 / max(1.0, segments);
+                    angle = abs(fmod(angle, slice) - slice * 0.5);
+                    float2 kaleidoUv = float2(cos(angle), sin(angle)) * radius + float2(0.5, 0.5);
+                    return SampleMain(kaleidoUv);
+                }
+                if (_Mode < 13.5)
+                {
+                    float blocks = lerp(160.0, 10.0, saturate(_Intensity));
+                    float aspect = abs(_MainTex_TexelSize.y / max(0.0001, _MainTex_TexelSize.x));
+                    float2 cell = float2(blocks, max(1.0, blocks / max(0.0001, aspect)));
+                    float2 pixelUv = (floor(uv * cell) + 0.5) / cell;
+                    return SampleMain(pixelUv);
+                }
 
-                float2 tiled = frac(uv * 2.0);
-                return SampleMain(tiled);
+                return col;
             }
             ENDCG
         }
